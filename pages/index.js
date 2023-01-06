@@ -11,11 +11,11 @@ const HomePage = ({ events }) => {
 
 export default HomePage;
 
-export async function getStaticProps() {
+export const getStaticProps = async () => {
   const featuredEvents = await getFeaturedEvents();
 
   return {
     props: { events: featuredEvents },
     revalidate: 1800,
   };
-}
+};
