@@ -22,14 +22,13 @@ const handler = async (req, res) => {
       const documents = await getAllDocuments(
         client,
         "comments",
-        { _id: -1 },
-        { eventId }
+        { _id: -1 }
+        // { eventId }
       );
       res.status(200).json({ comments: documents });
     } catch (error) {
-      return res.status(500).json({ message: "Getting comments failed!" });
-    } finally {
       client.close();
+      return res.status(500).json({ message: "Getting comments failed!" });
     }
   }
 
@@ -58,14 +57,13 @@ const handler = async (req, res) => {
     try {
       result = await insertDocument(client, "comments", newComment);
     } catch (error) {
-      return res.status(500).json({ message: "Inserting comment failed!" });
-    } finally {
       client.close();
+      return res.status(500).json({ message: "Inserting comment failed!" });
     }
 
-    newComment_id = result.insertedId;
-
     console.log(result);
+    newComment._id = result.insertedId;
+
     res.status(201).json({ message: "Added comment.", comment: newComment });
   }
 
