@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useState, useEffect } from "react";
 
 const initialCtxState = {
   notification: null,
@@ -10,6 +10,22 @@ const NotificationContext = createContext(initialCtxState);
 
 export const NotificationContextProvider = (props) => {
   const [acitveNotification, setActiveNotification] = useState();
+
+  useEffect(() => {
+    if (
+      acitveNotification &&
+      (acitveNotification.status === "success" ||
+        acitveNotification.status === "error")
+    ) {
+      const timer = setTimeout(() => {
+        setActiveNotification(null);
+      }, 3000);
+
+      return () => {
+        clearTimeout(timer);
+      };
+    }
+  }, [acitveNotification]);
 
   const showNotificationHandler = (notificationData) => {
     setActiveNotification(notificationData);

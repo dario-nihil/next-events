@@ -1,15 +1,23 @@
-import { useRef, useState } from "react";
+import { useRef, useState, useContext } from "react";
 
+import NotificationContext from "../../store/notification-context";
 import styles from "./newsletter-registration.module.css";
 
 function NewsletterRegistration() {
   const [isValid, setIsValid] = useState(true);
   const emailInputRef = useRef();
+  const ctx = useContext(NotificationContext);
 
   const registrationHandler = (event) => {
     event.preventDefault();
 
     const enteredEmail = emailInputRef.current.value;
+
+    ctx.showNotification({
+      title: "Signing up...",
+      message: "Registering for newsletter",
+      status: "pending",
+    });
 
     if (
       enteredEmail.trim().length === 0 ||
@@ -28,8 +36,29 @@ function NewsletterRegistration() {
         "Content-Type": "application/json",
       },
     })
-      .then((response) => response.json())
-      .then((data) => console.log(data));
+      .then((response) => {
+        if (response.ok) {
+          return response.json();
+        }
+
+        return response.json().then((data) => {
+          throw new Error(data.message || "Something went wrong!");
+        });
+      })
+      .then(() =>
+        ctx.showNotification({
+          title: "Success!",
+          message: "Successfully registered for newsletter!",
+          status: "success",
+        })
+      )
+      .catch((error) =>
+        ctx.showNotification({
+          title: "Error!",
+          message: error.message || "Something went wrong!",
+          status: "error",
+        })
+      );
 
     emailInputRef.current.value = "";
   };
